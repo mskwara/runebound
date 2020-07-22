@@ -1,13 +1,17 @@
 const mongoose = require("mongoose");
 
-const gamerSchema = new mongoose.Schema({
+const gameSchema = new mongoose.Schema({
+    name: String,
     players: [
         {
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
     ],
-    round: Number,
+    round: {
+        type: Number,
+        default: 0,
+    },
     currentPlay: {
         player: {
             type: mongoose.Schema.ObjectId,

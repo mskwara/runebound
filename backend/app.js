@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-// const cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser");
 // const globalErrorHandler = require("./controllers/errorController");
 const userRouter = require("./routers/userRouter");
+const gameRouter = require("./routers/gameRouter");
 const app = express();
 
 app.use(cors());
@@ -16,11 +17,12 @@ app.options("*", cors());
 
 app.use(express.json({ limit: "10kb" }));
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // ROUTES
 
 app.use("/api/users", userRouter);
+app.use("/api/games", gameRouter);
 
 // app.use(globalErrorHandler);
 

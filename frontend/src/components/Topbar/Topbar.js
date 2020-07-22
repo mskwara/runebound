@@ -6,7 +6,7 @@ const Topbar = (props) => {
     return (
         <div id="Topbar">
             <div className="left">
-                <Link className="link" to="/">
+                <Link className="link" to="/dashboard">
                     Runebound
                 </Link>
             </div>

@@ -1,0 +1,22 @@
+#NewGame {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .content {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        width: 100%;
+
+        .players-select {
+            margin-right: 20px;
+        }
+        .right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+}
