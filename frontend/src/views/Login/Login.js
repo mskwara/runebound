@@ -11,10 +11,12 @@ const Login = (props) => {
     const login = async () => {
         try {
             const response = await axios.post("api/users/login", userState);
+            const user = response.data.data.user;
+            console.log(user);
             if (response.data.status === "success") {
                 props.history.push("/dashboard");
+                localStorage.setItem("userId", user._id);
             }
-            // const user = response.data.data.user;
         } catch (err) {
             console.log(err);
         }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Signup.scss";
 import axios from "axios";
 
-const Signup = () => {
+const Signup = (props) => {
     const [userState, setUserState] = useState({
         nick: "",
         email: "",
@@ -16,7 +16,11 @@ const Signup = () => {
                 "http://localhost:8000/api/users/signup",
                 userState
             );
-            console.log(response.body);
+            const user = response.data.data.user;
+            if (response.data.status === "success") {
+                props.history.push("/dashboard");
+                localStorage.setItem("userId", user._id);
+            }
         } catch (err) {
             console.log(err);
         }

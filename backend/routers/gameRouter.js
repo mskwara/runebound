@@ -8,4 +8,6 @@ router
     .get(gameController.getAllGames)
     .post(gameController.createGame);
 
+router.route("/user/:id").get(gameController.getUserGames);
+
 module.exports = router;

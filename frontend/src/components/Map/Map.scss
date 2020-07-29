@@ -1,0 +1,44 @@
+$width: 60 * 20+20;
+$height: 68 * 9+34;
+
+#Map {
+    // border: 1px solid red;
+    position: relative;
+    width: $width + px;
+    height: $height + px;
+    margin: 20px;
+
+    .field {
+        width: 80px;
+        position: absolute;
+
+        img {
+            width: 80px;
+            z-index: 1;
+        }
+    }
+    .adventure {
+        width: 12px;
+        height: 12px;
+
+        border: 1px solid white;
+        border-radius: 12px;
+        position: absolute;
+        top: 30px;
+        left: 35px;
+
+        &.diff0 {
+            background-color: green;
+        }
+
+        &.diff1 {
+            background-color: yellow;
+        }
+        &.diff2 {
+            background-color: purple;
+        }
+        &.diff3 {
+            background-color: red;
+        }
+    }
+}

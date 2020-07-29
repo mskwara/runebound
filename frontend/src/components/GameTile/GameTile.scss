@@ -1,0 +1,60 @@
+@import "../../variables.scss";
+
+#GameTile {
+    width: 400px;
+    height: 300px;
+    border-radius: 2px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+
+    p {
+        color: black;
+    }
+    .title {
+        font-size: 25pt;
+        margin: 10px 0 0 5px;
+    }
+    .round {
+        font-size: 10pt;
+    }
+    .divider {
+        width: 80%;
+        border-bottom: 1px solid black;
+    }
+    .players {
+        width: 90%;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+
+        .row {
+            color: black;
+            width: auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            padding: 15px 0;
+
+            .icon {
+                width: 15px;
+                margin-right: 10px;
+            }
+        }
+    }
+
+    button {
+        height: 50px;
+        width: 100%;
+        margin: 0;
+        background-color: $primary;
+        border-radius: 0 0 2px 2px;
+
+        &:hover {
+            background-color: $primary-hover;
+        }
+    }
+}

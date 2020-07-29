@@ -29,50 +29,32 @@ const userSchema = new mongoose.Schema({
             message: "Passwords are not the same!",
         },
     },
-    player: {
-        inGame: {
-            type: Boolean,
-            default: false,
+    games: [
+        {
+            game: {
+                type: mongoose.Schema.ObjectId,
+                ref: "Game",
+            },
+            player: {
+                avatar: String,
+                money: Number,
+                items: [Number],
+                skills: {
+                    bow: Number,
+                    sword: Number,
+                    magic: Number,
+                },
+                health: {
+                    maxHealth: Number,
+                    current: Number,
+                },
+                position: {
+                    x: Number,
+                    y: Number,
+                },
+            },
         },
-        avatar: String,
-        money: Number,
-        items: [
-            Number,
-            // {
-            //     name: String,
-            //     type: {
-            //         type: String,
-            //         enum: ["weapon", "shield", "artifact"],
-            //     },
-            //     usage: {
-            //         type: String,
-            //         enum: ["forever", "every-round", "disposable"],
-            //     },
-            //     action: {
-            //         skillAdd: Number,
-            //         healthAdd: Number,
-            //         damageAdd: Number,
-            //         activeIn: {
-            //             type: String,
-            //             enum: ["bow", "sword", "magic"],
-            //         },
-            //     },
-            // },
-        ],
-        skills: {
-            bow: Number,
-            sword: Number,
-            magic: Number,
-        },
-        health: {
-            maxHealth: Number,
-            current: Number,
-        },
-        position: {
-            x: Number,
-            y: Number,
-        },
-    },
+    ],
 });
 
 userSchema.pre("save", async function (next) {

@@ -7,6 +7,8 @@ import Signup from "./views/Signup/Signup";
 import Login from "./views/Login/Login";
 import Dashboard from "./views/Dashboard/Dashboard";
 import NewGame from "./views/NewGame/NewGame";
+import ActiveGames from "./views/ActiveGames/ActiveGames";
+import Game from "./views/Game/Game";
 import axios from "axios";
 
 const App = (props) => {
@@ -17,8 +19,13 @@ const App = (props) => {
                 const response = await axios.get(
                     "http://localhost:3000/api/users/isLoggedIn"
                 );
-                user = response.data.data;
-                console.log(user);
+                user = response.data.data.user;
+                // console.log(user);
+                if (user != null) {
+                    localStorage.setItem("userId", user._id);
+                } else {
+                    localStorage.setItem("userId", null);
+                }
                 // if (user != null) {
                 //     props.history.push("/dashboard");
                 // } else {
@@ -41,6 +48,8 @@ const App = (props) => {
                     <Route path="/login" exact component={Login} />
                     <Route path="/dashboard" exact component={Dashboard} />
                     <Route path="/new-game" exact component={NewGame} />
+                    <Route path="/active-games" exact component={ActiveGames} />
+                    <Route path="/game" exact component={Game} />
                 </Switch>
             </div>
         </BrowserRouter>
