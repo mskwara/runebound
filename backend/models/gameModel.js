@@ -43,7 +43,7 @@ const gameSchema = new mongoose.Schema({
         },
         adventure: {
             skills: {
-                bow: Number,
+                archery: Number,
                 sword: Number,
                 magic: Number,
             },

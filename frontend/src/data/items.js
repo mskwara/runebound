@@ -14,7 +14,7 @@
 //         damageAdd: Number,
 //         activeIn: {
 //             type: String,
-//             enum: ["bow", "sword", "magic"],
+//             enum: ["archery", "sword", "magic"],
 //         },
 //     },
 // },

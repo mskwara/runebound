@@ -21,8 +21,7 @@ const GameTile = (props) => {
 
     const launchGame = () =>
         props.history.push({
-            pathname: "/game",
-            map: props.game.map,
+            pathname: `/games/${props.game._id}`,
         });
 
     return (

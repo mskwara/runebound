@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
                 money: Number,
                 items: [Number],
                 skills: {
-                    bow: Number,
+                    archery: Number,
                     sword: Number,
                     magic: Number,
                 },

@@ -15,11 +15,27 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.getUser = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.params.userId).select("-password");
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user,
+        },
+    });
+});
+
 const createSendToken = (user, statusCode, req, res) => {
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: `${process.env.JWT_COOKIE_EXPIRES_IN}d`,
+    });
     const cookieOptions = {
         httpOnly: true,
         secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
     };
 
     res.cookie("jwt", token, cookieOptions);
@@ -63,6 +79,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.isLoggedIn = async (req, res, next) => {
     try {
         if (req.cookies.jwt) {
+            console.log("jest jwt");
             // 1) verify token
             const decoded = await promisify(jwt.verify)(
                 req.cookies.jwt,

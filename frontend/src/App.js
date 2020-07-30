@@ -9,23 +9,23 @@ import Dashboard from "./views/Dashboard/Dashboard";
 import NewGame from "./views/NewGame/NewGame";
 import ActiveGames from "./views/ActiveGames/ActiveGames";
 import Game from "./views/Game/Game";
-import axios from "axios";
+// import axios from "axios";
 
 const App = (props) => {
     useEffect(() => {
-        let user = null;
+        // let user = null;
         const checkLogin = async () => {
             try {
-                const response = await axios.get(
-                    "http://localhost:3000/api/users/isLoggedIn"
-                );
-                user = response.data.data.user;
+                // const response = await axios.get(
+                //     "http://localhost:8000/api/users/isLoggedIn"
+                // );
+                // user = response.data.data.user;
                 // console.log(user);
-                if (user != null) {
-                    localStorage.setItem("userId", user._id);
-                } else {
-                    localStorage.setItem("userId", null);
-                }
+                // if (user != null) {
+                //     localStorage.setItem("userId", user._id);
+                // } else {
+                //     localStorage.setItem("userId", null);
+                // }
                 // if (user != null) {
                 //     props.history.push("/dashboard");
                 // } else {
@@ -49,7 +49,7 @@ const App = (props) => {
                     <Route path="/dashboard" exact component={Dashboard} />
                     <Route path="/new-game" exact component={NewGame} />
                     <Route path="/active-games" exact component={ActiveGames} />
-                    <Route path="/game" exact component={Game} />
+                    <Route path="/games/:gameId" exact component={Game} />
                 </Switch>
             </div>
         </BrowserRouter>

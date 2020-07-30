@@ -50,7 +50,7 @@ const NewGame = (props) => {
         }
         cities.forEach((city, cityId) => {
             // create cities
-            const index = Math.floor(Math.random() * (rows * col + 1 - 0)) + 0;
+            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isCity = true;
             map[index].city = cityId;
         });
@@ -58,7 +58,7 @@ const NewGame = (props) => {
         for (let i = 0; i < 15; i++) {
             // create green adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col + 1 - 0)) + 0;
+            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -68,7 +68,7 @@ const NewGame = (props) => {
         for (let i = 0; i < 10; i++) {
             // create yellow adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col + 1 - 0)) + 0;
+            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -78,7 +78,7 @@ const NewGame = (props) => {
         for (let i = 0; i < 7; i++) {
             // create purple adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col + 1 - 0)) + 0;
+            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -88,7 +88,7 @@ const NewGame = (props) => {
         for (let i = 0; i < 5; i++) {
             // create red adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col + 1 - 0)) + 0;
+            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
