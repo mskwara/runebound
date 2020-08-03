@@ -33,15 +33,19 @@ const NewGame = (props) => {
         const rows = 9;
         const col = 20;
         for (let i = 0; i < rows * col; i++) {
-            let type = Math.floor(Math.random() * (11 - 0)) + 0;
+            let type = Math.floor(Math.random() * (16 - 0)) + 0;
             if (type <= 5) {
                 type = "field_flat";
-            } else if (type <= 7) {
+            } else if (type <= 8) {
                 type = "field_hill";
-            } else if (type <= 9) {
-                type = "field_lake";
             } else if (type <= 10) {
+                type = "field_lake";
+            } else if (type <= 12) {
                 type = "field_mountain";
+            } else if (type <= 14) {
+                type = "field_forest";
+            } else if (type <= 15) {
+                type = "field_marsh";
             }
             const field = {
                 terrain: type,
@@ -103,8 +107,9 @@ const NewGame = (props) => {
         const data = { ...gameState };
         data.map = map;
         try {
-            const response = await axios.post("api/games", data);
-            console.log(response.data);
+            await axios.post("api/games", data);
+            // console.log(response.data);
+            props.history.push("/active-games");
         } catch (err) {
             console.log(err);
         }

@@ -3,7 +3,8 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 
 exports.getAllGames = catchAsync(async (req, res, next) => {
-    const games = await Game.find().select("-map");
+    const games = await Game.find().select("-map").sort({ createdAt: "1" });
+    console.log(games);
 
     res.status(200).json({
         status: "success",
@@ -29,12 +30,47 @@ exports.getUserGames = catchAsync(async (req, res, next) => {
 });
 
 exports.getGame = catchAsync(async (req, res, next) => {
-    const game = await Game.findById(req.params.gameId);
+    let game = await Game.findById(req.params.gameId).lean();
+
+    game.players = game.players.map((player) => {
+        const hisGames = player.user.games;
+        player.user.games = undefined;
+        const currentGame = hisGames.filter(
+            (game) => game.game == req.params.gameId
+        )[0];
+        player.character = currentGame.player;
+        return player;
+    });
 
     res.status(200).json({
         status: "success",
         data: {
             game,
+        },
+    });
+});
+
+exports.getUsersPlayingGame = catchAsync(async (req, res, next) => {
+    const userIds = (await Game.findById(req.params.gameId)).players.map(
+        (p) => p.user._id
+    );
+    let users = await User.find({ _id: { $in: userIds } }).select("-password");
+    users = users.map((user) => {
+        const currentGame = user.games.find(
+            (game) => game.game == req.params.gameId
+        );
+        return {
+            _id: user._id,
+            nick: user.nick,
+            player: currentGame.player,
+        };
+    });
+
+    res.status(200).json({
+        status: "success",
+        results: users.length,
+        data: {
+            users,
         },
     });
 });
@@ -82,6 +118,9 @@ exports.acceptGame = catchAsync(async (req, res, next) => {
             { _id: req.params.gameId },
             {
                 $inc: { round: 1 },
+                currentPlay: {
+                    player: players[0].user._id,
+                },
             }
         );
     }
@@ -104,8 +143,8 @@ exports.acceptGame = catchAsync(async (req, res, next) => {
                         current: req.body.health,
                     },
                     position: {
-                        x: 5,
-                        y: 5,
+                        x: req.body.position.x,
+                        y: req.body.position.y,
                     },
                 },
             },
@@ -117,6 +156,22 @@ exports.acceptGame = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             user,
+        },
+    });
+});
+
+exports.setDices = catchAsync(async (req, res, next) => {
+    const game = await Game.findByIdAndUpdate(req.params.gameId, {
+        $set: {
+            "currentPlay.dicesResult": req.body.dicesResult,
+            "currentPlay.status": req.body.status,
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            game,
         },
     });
 });

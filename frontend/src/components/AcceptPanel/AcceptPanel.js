@@ -54,6 +54,10 @@ const AcceptPanel = (props) => {
             magic: state.magic,
             health: state.health,
             avatar: "knight" + state.avatarNum,
+            position: {
+                x: props.startPosition.y,
+                y: props.startPosition.x,
+            },
         };
         const response = await axios.post(
             `http://localhost:8000/api/games/${props.gameId}/user/${localStorage.userId}/accept`,

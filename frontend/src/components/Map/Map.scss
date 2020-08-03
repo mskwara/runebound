@@ -8,6 +8,13 @@ $height: 68 * 9+34;
     height: $height + px;
     margin: 20px;
 
+    .avatar {
+        width: 30px;
+        height: 30px;
+        border: 2px solid yellow;
+        position: absolute;
+    }
+
     .field {
         width: 80px;
         position: absolute;
@@ -24,8 +31,8 @@ $height: 68 * 9+34;
         border: 1px solid white;
         border-radius: 12px;
         position: absolute;
-        top: 30px;
-        left: 35px;
+        top: 28px;
+        left: 34px;
 
         &.diff0 {
             background-color: green;

@@ -9,7 +9,9 @@ router
     .post(gameController.createGame);
 
 router.route("/:gameId").get(gameController.getGame);
+router.route("/:gameId/users").get(gameController.getUsersPlayingGame);
 router.route("/:gameId/user/:userId/accept").post(gameController.acceptGame);
+router.route("/:gameId/setDices").post(gameController.setDices);
 
 router.route("/user/:id").get(gameController.getUserGames);
 

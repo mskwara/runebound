@@ -3,4 +3,22 @@
     justify-content: center;
     // padding-top: 30px;
     width: 100%;
+
+    .whoPlaying {
+        background-color: rgb(255, 72, 0);
+        opacity: 0.9;
+        width: auto;
+        height: 40px;
+        color: white;
+        padding: 5px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 60px;
+        z-index: 5;
+        border-radius: 3px;
+    }
 }

@@ -1,0 +1,36 @@
+#GameNavBar {
+    width: 70px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    left: 20px;
+    top: 70px;
+
+    .btn {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: 0.5s;
+
+        &:hover {
+            width: 60px;
+            height: 60px;
+        }
+
+        img {
+            width: 60%;
+        }
+    }
+
+    .disabled {
+        background: rgba(105, 105, 105, 0.3);
+    }
+}

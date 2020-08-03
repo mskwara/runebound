@@ -18,3 +18,9 @@
 //         },
 //     },
 // },
+
+const baw = [
+    {
+        actionAfterUse: () => {},
+    },
+];

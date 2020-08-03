@@ -14,28 +14,29 @@ import Game from "./views/Game/Game";
 const App = (props) => {
     useEffect(() => {
         // let user = null;
-        const checkLogin = async () => {
-            try {
-                // const response = await axios.get(
-                //     "http://localhost:8000/api/users/isLoggedIn"
-                // );
-                // user = response.data.data.user;
-                // console.log(user);
-                // if (user != null) {
-                //     localStorage.setItem("userId", user._id);
-                // } else {
-                //     localStorage.setItem("userId", null);
-                // }
-                // if (user != null) {
-                //     props.history.push("/dashboard");
-                // } else {
-                //     props.history.push("/");
-                // }
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        checkLogin();
+        // props.history.push("/dashboard");
+        // const checkLogin = async () => {
+        //     try {
+        //         // const response = await axios.get(
+        //         //     "http://localhost:8000/api/users/isLoggedIn"
+        //         // );
+        //         // user = response.data.data.user;
+        //         // console.log(user);
+        //         // if (user != null) {
+        //         //     localStorage.setItem("userId", user._id);
+        //         // } else {
+        //         //     localStorage.setItem("userId", null);
+        //         // }
+        //         // if (user) {
+        //         //     props.history.push("/dashboard");
+        //         // } else {
+        //         //     props.history.push("/");
+        //         // }
+        //     } catch (err) {
+        //         console.log(err);
+        //     }
+        // };
+        // checkLogin();
     });
 
     return (

@@ -41,6 +41,12 @@ const gameSchema = new mongoose.Schema({
             type: mongoose.Schema.ObjectId,
             ref: "User",
         },
+        status: {
+            type: String,
+            enum: ["dices", "after_dices", "move", "adventure", "city"],
+            default: "dices",
+        },
+        dicesResult: [Object],
         adventure: {
             skills: {
                 archery: Number,
@@ -53,13 +59,21 @@ const gameSchema = new mongoose.Schema({
             },
         },
     },
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+    },
 });
 
 gameSchema.pre(/^find/, function (next) {
     this.populate({
         path: "players.user",
-        select: "nick",
+        select: "nick games",
     });
+    // .populate({
+    //     path: "currentPlay.player",
+    //     select: "nick",
+    // });
     next();
 });
 
