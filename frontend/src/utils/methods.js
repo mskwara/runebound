@@ -1,7 +1,7 @@
 exports.getPossibleMoves = (map, dices, startX, startY) => {
     const maxI = 8;
     const maxJ = 19;
-    const dicesCount = dices.length;
+    // const dicesCount = dices.length;
     const DFSVisit = (
         i,
         j,
@@ -96,7 +96,7 @@ exports.getPossibleMoves = (map, dices, startX, startY) => {
             // left
             toDoForConnectedField(i, j - 1, i, j);
         }
-        if (j % 2 == 0) {
+        if (j % 2 === 0) {
             // dla parzystych x
             if (
                 i - 1 >= 0 &&

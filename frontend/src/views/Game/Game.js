@@ -6,6 +6,7 @@ import Map from "../../components/Map/Map";
 import GameNavBar from "../../components/GameNavBar/GameNavBar";
 import AcceptPanel from "../../components/AcceptPanel/AcceptPanel";
 import DicesView from "../../components/DicesView/DicesView";
+import Loader from "../../components/Loader/Loader";
 import diceData from "../../data/dice";
 import { getPossibleMoves } from "../../utils/methods";
 import axios from "axios";
@@ -15,6 +16,7 @@ const Game = (props) => {
         game: null,
         user: null,
         card: "map",
+        loading: true,
     });
 
     const [moveState, setMoveState] = useState({
@@ -23,21 +25,28 @@ const Game = (props) => {
         showDices: false,
     });
 
+    const convertMapTo2d = (plainMap) => {
+        const rows = 9;
+        const columns = 20;
+        const map2d = [];
+        for (let i = 0; i < rows * columns; i += columns) {
+            const oneRow = plainMap.slice(i, i + columns);
+            map2d.push(oneRow);
+        }
+        return map2d;
+    };
+
     const getGame = async () => {
+        setState((state) => ({ ...state, loading: true }));
         const response = await axios.get(
             `http://localhost:8000/api/games/${props.match.params.gameId}`
         );
         const game = response.data.data.game;
+        // console.log(game);
         // change map array to map2d array
-        const rows = 9;
-        const columns = 20;
-        const map = game.map;
-        const map2d = [];
-        for (let i = 0; i < rows * columns; i += columns) {
-            const oneRow = map.slice(i, i + columns);
-            map2d.push(oneRow);
-        }
-        game.map = map2d;
+
+        game.map = convertMapTo2d(game.map);
+        setState((state) => ({ ...state, loading: false }));
 
         return game;
     };
@@ -54,6 +63,7 @@ const Game = (props) => {
             const user = response2.data.data.user;
 
             setState((state) => ({ ...state, game, user }));
+
             if (
                 game.currentPlay.dicesResult.length > 0 &&
                 game.currentPlay.player == localStorage.getItem("userId")
@@ -76,6 +86,7 @@ const Game = (props) => {
                     showDices: true,
                 }));
             }
+            setState((state) => ({ ...state, loading: false }));
         };
         getGameAndUser();
     }, []);
@@ -87,6 +98,34 @@ const Game = (props) => {
 
     const hideDicesResult = () => {
         setMoveState((moveState) => ({ ...moveState, showDices: false }));
+    };
+
+    const goToField = async (x, y) => {
+        setState((state) => ({ ...state, loading: true }));
+        let status = "dices"; // empty field -> next player
+        if (state.game.map[y][x].isCity) {
+            status = "city";
+        } else if (state.game.map[y][x].isAdventure) {
+            status = "adventure";
+        }
+        const response = await axios.post(
+            `http://localhost:8000/api/games/${state.game._id}/user/${state.game.currentPlay.player}/move`,
+            { x, y, status }
+        );
+        response.data.data.game.map = convertMapTo2d(
+            response.data.data.game.map
+        );
+        setState((state) => ({
+            ...state,
+            game: response.data.data.game,
+            user: response.data.data.user,
+        }));
+
+        setMoveState((moveState) => ({
+            ...moveState,
+            possibleMoves: null,
+        }));
+        setState((state) => ({ ...state, loading: false }));
     };
 
     const navClickHandler = async (nav) => {
@@ -121,11 +160,14 @@ const Game = (props) => {
                 showDices: true,
             }));
 
-            await axios.post(
+            const response = await axios.post(
                 `http://localhost:8000/api/games/${state.game._id}/setDices`,
-                { dicesResult, status: "after_dices" }
+                { dicesResult, status: "move" }
             );
-            getGame();
+            response.data.data.game.map = convertMapTo2d(
+                response.data.data.game.map
+            );
+            setState((state) => ({ ...state, game: response.data.data.game }));
         }
     };
 
@@ -145,6 +187,7 @@ const Game = (props) => {
                 players={state.game.players}
                 gameId={state.game._id}
                 possibleMoves={moveState.possibleMoves}
+                onFieldClick={goToField}
             />
         );
         // check if all accepted already
@@ -227,6 +270,7 @@ const Game = (props) => {
 
     return (
         <div id="Game">
+            {state.loading ? <Loader /> : null}
             {whoPlaying}
             {content}
             {gameNavBar}

@@ -43,7 +43,7 @@ const gameSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ["dices", "after_dices", "move", "adventure", "city"],
+            enum: ["dices", "move", "adventure", "city"],
             default: "dices",
         },
         dicesResult: [Object],

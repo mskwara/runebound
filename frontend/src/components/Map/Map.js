@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./Map.scss";
-import axios from "axios";
 
 const Map = (props) => {
     let map = [];
@@ -17,7 +16,10 @@ const Map = (props) => {
             }
             style.top = `${topVal}px`;
 
-            if (props.possibleMoves != null) {
+            let onClickAction = null;
+            let clickableAreaClass = "clickableArea";
+
+            if (props.possibleMoves !== null) {
                 style.opacity = 0.5;
                 if (
                     props.possibleMoves.filter(
@@ -25,6 +27,8 @@ const Map = (props) => {
                     ).length > 0
                 ) {
                     style.opacity = 1;
+                    clickableAreaClass += " clickable";
+                    onClickAction = props.onFieldClick.bind(this, col, row);
                 }
             }
 
@@ -42,6 +46,10 @@ const Map = (props) => {
                                 src={require(`../../assets/${props.map[row][col].terrain}.png`)}
                                 alt="field"
                             />
+                            <div
+                                className={clickableAreaClass}
+                                onClick={onClickAction}
+                            />
                         </div>
                     );
                 } else {
@@ -58,6 +66,10 @@ const Map = (props) => {
                                 alt="field"
                             />
                             <div className={advClass} />
+                            <div
+                                className={clickableAreaClass}
+                                onClick={onClickAction}
+                            />
                         </div>
                     );
                 }
@@ -68,6 +80,10 @@ const Map = (props) => {
                         <img
                             src={require(`../../assets/field_city.png`)}
                             alt="city"
+                        />
+                        <div
+                            className={clickableAreaClass}
+                            onClick={onClickAction}
                         />
                     </div>
                 );
@@ -88,7 +104,7 @@ const Map = (props) => {
         }
         positionTable[p.character.position.x][p.character.position.y] += 1;
         let plusTop = 68 * p.character.position.y;
-        if (p.character.position.x % 2 != 0) {
+        if (p.character.position.x % 2 !== 0) {
             plusTop += 34;
         }
         const style = {

@@ -62,7 +62,13 @@ const NewGame = (props) => {
         for (let i = 0; i < 15; i++) {
             // create green adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            let index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            while (
+                map[index].isCity === true ||
+                map[index].isAdventure === true
+            ) {
+                index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            }
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -72,7 +78,13 @@ const NewGame = (props) => {
         for (let i = 0; i < 10; i++) {
             // create yellow adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            let index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            while (
+                map[index].isCity === true ||
+                map[index].isAdventure === true
+            ) {
+                index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            }
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -82,7 +94,13 @@ const NewGame = (props) => {
         for (let i = 0; i < 7; i++) {
             // create purple adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            let index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            while (
+                map[index].isCity === true ||
+                map[index].isAdventure === true
+            ) {
+                index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            }
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,
@@ -92,7 +110,13 @@ const NewGame = (props) => {
         for (let i = 0; i < 5; i++) {
             // create red adventures
             const advId = 0; // TODO
-            const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            let index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            while (
+                map[index].isCity === true ||
+                map[index].isAdventure === true
+            ) {
+                index = Math.floor(Math.random() * (rows * col - 0)) + 0;
+            }
             map[index].isAdventure = true;
             map[index].adventure = {
                 id: advId,

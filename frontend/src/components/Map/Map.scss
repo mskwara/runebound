@@ -22,6 +22,19 @@ $height: 68 * 9+34;
         img {
             width: 80px;
             z-index: 1;
+            // border: 1px solid red;
+        }
+
+        .clickableArea {
+            width: 40px;
+            height: 68px;
+            position: absolute;
+            top: 0;
+            left: 20px;
+        }
+
+        .clickable {
+            cursor: pointer;
         }
     }
     .adventure {
