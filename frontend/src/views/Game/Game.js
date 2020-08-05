@@ -7,7 +7,10 @@ import GameNavBar from "../../components/GameNavBar/GameNavBar";
 import AcceptPanel from "../../components/AcceptPanel/AcceptPanel";
 import DicesView from "../../components/DicesView/DicesView";
 import Loader from "../../components/Loader/Loader";
+import CityView from "../../components/CityView/CityView";
+import PlayerView from "../../components/PlayerView/PlayerView";
 import diceData from "../../data/dice";
+import items from "../../data/items";
 import { getPossibleMoves } from "../../utils/methods";
 import axios from "axios";
 
@@ -25,6 +28,14 @@ const Game = (props) => {
         showDices: false,
     });
 
+    const [playerState, setPlayerState] = useState({
+        userId: null,
+    });
+
+    const setLoading = (value) => {
+        setState((state) => ({ ...state, loading: value }));
+    };
+
     const convertMapTo2d = (plainMap) => {
         const rows = 9;
         const columns = 20;
@@ -37,7 +48,7 @@ const Game = (props) => {
     };
 
     const getGame = async () => {
-        setState((state) => ({ ...state, loading: true }));
+        setLoading(true);
         const response = await axios.get(
             `http://localhost:8000/api/games/${props.match.params.gameId}`
         );
@@ -46,7 +57,7 @@ const Game = (props) => {
         // change map array to map2d array
 
         game.map = convertMapTo2d(game.map);
-        setState((state) => ({ ...state, loading: false }));
+        setLoading(false);
 
         return game;
     };
@@ -63,12 +74,15 @@ const Game = (props) => {
             const user = response2.data.data.user;
 
             setState((state) => ({ ...state, game, user }));
+            setPlayerState((playerState) => ({
+                ...playerState,
+                userId: user._id,
+            }));
 
             if (
                 game.currentPlay.dicesResult.length > 0 &&
                 game.currentPlay.player == localStorage.getItem("userId")
             ) {
-                console.log("bla bla bla");
                 // jeżeli zostały już rzucone kości i jest ruch zalogowanej osoby
                 const loggedPlayer = user.games.filter(
                     (el) => el.game == game._id
@@ -86,50 +100,34 @@ const Game = (props) => {
                     showDices: true,
                 }));
             }
-            setState((state) => ({ ...state, loading: false }));
+            setLoading(false);
         };
         getGameAndUser();
     }, []);
 
-    const handleUserChange = (newUser) => {
-        setState((state) => ({ ...state, user: newUser }));
-        getGame();
+    const handleUserChange = async (newUser) => {
+        const game = await getGame();
+        setState((state) => ({ ...state, game, user: newUser }));
+    };
+
+    const updateUserAndGame = (newUser, newGame) => {
+        newGame.map = convertMapTo2d(newGame.map);
+        setState((state) => ({ ...state, game: newGame, user: newUser }));
     };
 
     const hideDicesResult = () => {
         setMoveState((moveState) => ({ ...moveState, showDices: false }));
     };
 
-    const goToField = async (x, y) => {
-        setState((state) => ({ ...state, loading: true }));
-        let status = "dices"; // empty field -> next player
-        if (state.game.map[y][x].isCity) {
-            status = "city";
-        } else if (state.game.map[y][x].isAdventure) {
-            status = "adventure";
-        }
-        const response = await axios.post(
-            `http://localhost:8000/api/games/${state.game._id}/user/${state.game.currentPlay.player}/move`,
-            { x, y, status }
-        );
-        response.data.data.game.map = convertMapTo2d(
-            response.data.data.game.map
-        );
-        setState((state) => ({
-            ...state,
-            game: response.data.data.game,
-            user: response.data.data.user,
-        }));
-
-        setMoveState((moveState) => ({
-            ...moveState,
-            possibleMoves: null,
-        }));
-        setState((state) => ({ ...state, loading: false }));
+    const finishHandler = async () => {
+        const game = await getGame();
+        setState((state) => ({ ...state, game }));
     };
 
     const navClickHandler = async (nav) => {
-        setState((state) => ({ ...state, card: nav }));
+        if (nav != "dices") {
+            setState((state) => ({ ...state, card: nav }));
+        }
 
         if (nav === "dices") {
             const dicesResult = [];
@@ -171,25 +169,59 @@ const Game = (props) => {
         }
     };
 
+    const goToField = async (x, y) => {
+        setState((state) => ({ ...state, loading: true }));
+        hideDicesResult();
+
+        let status = "dices"; // empty field -> next player
+        let itemId = null;
+        let cityId = null;
+        if (state.game.map[y][x].isCity) {
+            // goes to City
+            status = "city";
+            if (state.game.availableItems.length > 0) {
+                // zostały jeszcze wolne przedmioty
+                const itemIndex =
+                    Math.floor(
+                        Math.random() * (state.game.availableItems.length - 0)
+                    ) + 0;
+                itemId = state.game.availableItems[itemIndex];
+            }
+            cityId = state.game.map[y][x].city;
+        } else if (state.game.map[y][x].isAdventure) {
+            status = "adventure";
+        }
+        const response = await axios.post(
+            `http://localhost:8000/api/games/${state.game._id}/user/${state.game.currentPlay.player}/move`,
+            { x, y, status, itemId, cityId }
+        );
+        response.data.data.game.map = convertMapTo2d(
+            response.data.data.game.map
+        );
+        setState((state) => ({
+            ...state,
+            game: response.data.data.game,
+            user: response.data.data.user,
+        }));
+
+        setMoveState((moveState) => ({
+            ...moveState,
+            possibleMoves: null,
+        }));
+        setLoading(false);
+    };
+
     let map = null;
     let acceptpanel = null;
     let content = null;
     let gameNavBar = null;
     let dicesView = null;
     let whoPlaying = null;
+    let cityView = null;
 
     if (state.game != null && state.user != null) {
         // console.log(state);
 
-        map = (
-            <Map
-                map={state.game.map}
-                players={state.game.players}
-                gameId={state.game._id}
-                possibleMoves={moveState.possibleMoves}
-                onFieldClick={goToField}
-            />
-        );
         // check if all accepted already
         let allAccepted = true;
         for (let i = 0; i < state.game.players.length; i++) {
@@ -199,14 +231,24 @@ const Game = (props) => {
             }
         }
         if (allAccepted) {
-            // if (state.card === "map") {
-            content = map;
-            // }
+            if (state.card === "map") {
+                content = (
+                    <Map
+                        map={state.game.map}
+                        players={state.game.players}
+                        gameId={state.game._id}
+                        possibleMoves={moveState.possibleMoves}
+                        onFieldClick={goToField}
+                    />
+                );
+            } else if (state.card === "player") {
+                const playerToShow = state.game.players.filter(
+                    (p) => p.user._id === playerState.userId
+                )[0];
+                content = <PlayerView player={playerToShow} />;
+            }
             // else if (state.card === "dices") {
             //     content = "dices";
-            // } else if (state.card === "adventure") {
-            //     content = "adventure";
-            // }
         } else {
             //find first city
             let cityPos = null;
@@ -256,6 +298,33 @@ const Game = (props) => {
                         />
                     );
                 }
+                if (state.game.currentPlay.status === "city") {
+                    const currentPosition = state.user.games.filter(
+                        (g) => g.game === state.game._id
+                    )[0].player.position;
+                    const field =
+                        state.game.map[currentPosition.y][currentPosition.x];
+                    const items = state.game.cities.filter(
+                        (c) => c.cityId === field.city
+                    )[0].items;
+
+                    const player = state.user.games.filter(
+                        (g) => g.game === state.game._id
+                    )[0].player;
+
+                    cityView = (
+                        <CityView
+                            cityId={field.city}
+                            items={items}
+                            gameId={state.game._id}
+                            userId={state.user._id}
+                            player={player}
+                            finishHandler={finishHandler}
+                            updateUserAndGame={updateUserAndGame}
+                            setLoading={setLoading}
+                        />
+                    );
+                }
             } else {
                 //ruch innej osoby
                 const nick = state.game.players.filter(
@@ -275,6 +344,7 @@ const Game = (props) => {
             {content}
             {gameNavBar}
             {dicesView}
+            {cityView}
         </div>
     );
 };

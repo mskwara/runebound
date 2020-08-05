@@ -3,8 +3,10 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 
 exports.getAllGames = catchAsync(async (req, res, next) => {
-    const games = await Game.find().select("-map").sort({ createdAt: "-1" });
-    console.log(games);
+    const games = await Game.find()
+        .populate({ path: "players.user", select: "nick" })
+        .select("-map")
+        .sort({ createdAt: "-1" });
 
     res.status(200).json({
         status: "success",
@@ -19,6 +21,7 @@ exports.getUserGames = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.params.id);
     const gameIds = user.games.map((el) => el.game);
     const games = await Game.find({ _id: { $in: gameIds } })
+        .populate({ path: "players.user", select: "nick" })
         .select("-map")
         .sort({ createdAt: "-1" });
 
@@ -32,8 +35,10 @@ exports.getUserGames = catchAsync(async (req, res, next) => {
 });
 
 const getGame = async (gameId) => {
-    let game = await Game.findById(gameId).lean();
-
+    let game = await Game.findById(gameId)
+        .populate({ path: "players.user", select: "nick games" })
+        .lean();
+    console.log(game.players[0].user);
     return transformGamePlayers(game, gameId);
 };
 
@@ -41,7 +46,11 @@ const transformGamePlayers = (game, gameId) => {
     game.players = game.players.map((player) => {
         const hisGames = player.user.games;
         player.user.games = undefined;
-        const currentGame = hisGames.filter((game) => game.game == gameId)[0];
+        // console.log("hg", hisGames);
+        const currentGame = hisGames.filter((game) => {
+            return game.game == gameId;
+        })[0];
+        // console.log(currentGame);
         player.character = currentGame.player;
         return player;
     });
@@ -55,31 +64,6 @@ exports.getGame = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             game,
-        },
-    });
-});
-
-exports.getUsersPlayingGame = catchAsync(async (req, res, next) => {
-    const userIds = (await Game.findById(req.params.gameId)).players.map(
-        (p) => p.user._id
-    );
-    let users = await User.find({ _id: { $in: userIds } }).select("-password");
-    users = users.map((user) => {
-        const currentGame = user.games.find(
-            (game) => game.game == req.params.gameId
-        );
-        return {
-            _id: user._id,
-            nick: user.nick,
-            player: currentGame.player,
-        };
-    });
-
-    res.status(200).json({
-        status: "success",
-        results: users.length,
-        data: {
-            users,
         },
     });
 });
@@ -204,7 +188,9 @@ exports.setDices = catchAsync(async (req, res, next) => {
             },
         },
         { new: true }
-    ).lean();
+    )
+        .populate({ path: "players.user", select: "nick games" })
+        .lean();
 
     game = transformGamePlayers(game, req.params.gameId);
 
@@ -215,6 +201,32 @@ exports.setDices = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+const finishPlayerTurn = async (gameId, userId, status) => {
+    const game = await Game.findById(gameId);
+    const currentPlayer = game.players.filter((p) => p.user._id == userId)[0];
+    let nextPlayerIndex = game.players.indexOf(currentPlayer) + 1;
+    if (nextPlayerIndex == game.players.length) {
+        nextPlayerIndex = 0;
+    }
+    const nextPlayerId = game.players[nextPlayerIndex].user._id;
+
+    const updGame = await Game.findByIdAndUpdate(
+        gameId,
+        {
+            $set: {
+                "currentPlay.player": nextPlayerId,
+                "currentPlay.dicesResult": [],
+                "currentPlay.status": status,
+            },
+        },
+        { new: true }
+    )
+        .populate({ path: "players.user", select: "nick games" })
+        .lean();
+
+    return updGame;
+};
 
 exports.moveToChosenField = catchAsync(async (req, res, next) => {
     //update user
@@ -240,29 +252,15 @@ exports.moveToChosenField = catchAsync(async (req, res, next) => {
     // update game
     let updGame = null;
     if (req.body.status === "dices") {
-        const game = await Game.findById(req.params.gameId);
-        const currentPlayer = game.players.filter(
-            (p) => p.user._id == req.params.userId
-        )[0];
-        let nextPlayerIndex = game.players.indexOf(currentPlayer) + 1;
-        if (nextPlayerIndex == game.players.length) {
-            nextPlayerIndex = 0;
-        }
-        const nextPlayerId = game.players[nextPlayerIndex].user._id;
-
-        updGame = await Game.findByIdAndUpdate(
+        // kolejka następnego gracza
+        updGame = await finishPlayerTurn(
             req.params.gameId,
-            {
-                $set: {
-                    "currentPlay.player": nextPlayerId,
-                    "currentPlay.dicesResult": [],
-                    "currentPlay.status": req.body.status,
-                },
-            },
-            { new: true }
-        ).lean();
+            req.params.userId,
+            req.body.status
+        );
     } else {
         updGame = await Game.findByIdAndUpdate(
+            // dla city i adventure
             req.params.gameId,
             {
                 $set: {
@@ -271,7 +269,48 @@ exports.moveToChosenField = catchAsync(async (req, res, next) => {
                 },
             },
             { new: true }
-        ).lean();
+        )
+            .populate({ path: "players.user", select: "nick games" })
+            .lean();
+
+        if (req.body.status === "city" && req.body.itemId != null) {
+            // doszedł do miasta
+            await Game.findOneAndUpdate(
+                // add item to city
+                { _id: req.params.gameId, "cities.cityId": req.body.cityId },
+                {
+                    $push: {
+                        "cities.$.items": req.body.itemId,
+                    },
+                }
+            );
+            updGame = await Game.findOneAndUpdate(
+                // remove item from available items
+                { _id: req.params.gameId },
+                {
+                    $pull: {
+                        availableItems: req.body.itemId,
+                    },
+                },
+                { new: true }
+            )
+                .populate({ path: "players.user", select: "nick games" })
+                .lean();
+        } else if (req.body.status === "adventure") {
+            // doszedł do przygody
+            // updGame = await Game.findByIdAndUpdate(
+            //     req.params.gameId,
+            //     {
+            //         $set: {
+            //             "currentPlay.dicesResult": [],
+            //             "currentPlay.status": req.body.status,
+            //         },
+            //     },
+            //     { new: true }
+            // )
+            //     .populate({ path: "players.user", select: "nick games" })
+            //     .lean();
+        }
     }
     updGame = transformGamePlayers(updGame, req.params.gameId);
 
@@ -280,6 +319,60 @@ exports.moveToChosenField = catchAsync(async (req, res, next) => {
         data: {
             game: updGame,
             user: updUser,
+        },
+    });
+});
+
+exports.buyItem = catchAsync(async (req, res, next) => {
+    let game = await Game.findOneAndUpdate(
+        // remove item from city
+        { _id: req.params.gameId, "cities.cityId": req.body.cityId },
+        {
+            $pull: {
+                "cities.$.items": req.body.itemId,
+            },
+        },
+        { new: true }
+    )
+        .populate({ path: "players.user", select: "nick games" })
+        .lean();
+
+    const user = await User.findOneAndUpdate(
+        // add item to player
+        { _id: req.params.userId, "games.game": req.params.gameId },
+        {
+            $push: {
+                "games.$.player.items": req.body.itemId,
+            },
+            $inc: {
+                "games.$.player.money": -req.body.price,
+            },
+        },
+        { new: true }
+    );
+
+    game = transformGamePlayers(game, req.params.gameId);
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            game,
+            user,
+        },
+    });
+});
+
+exports.finishPlayerTurn = catchAsync(async (req, res, next) => {
+    const game = await finishPlayerTurn(
+        req.params.gameId,
+        req.params.userId,
+        req.body.status
+    );
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            gameStatus: game.currentPlay.status,
         },
     });
 });

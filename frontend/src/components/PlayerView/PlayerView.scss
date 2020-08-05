@@ -1,0 +1,62 @@
+@import "../../variables.scss";
+
+#PlayerView {
+    width: 70%;
+    min-width: 650px;
+    height: 500px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 20px;
+    margin: 20px 0 0 120px;
+    border-radius: 2px;
+
+    background-color: white;
+
+    span {
+        img {
+            width: 200px;
+            height: 200px;
+            border: 2px solid white;
+        }
+        p {
+            font-size: 20pt;
+            margin: 5px;
+            color: black;
+            max-width: 250px;
+        }
+    }
+
+    .skills {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        // border: 1px solid red;
+        height: 200px;
+        flex: 1;
+
+        .one-skill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            p {
+                display: inline;
+                color: black;
+                margin: 0;
+            }
+
+            .big {
+                font-size: 18pt;
+            }
+            .small {
+                font-size: 10pt;
+            }
+
+            img {
+                width: 80px;
+                margin-bottom: 10px;
+            }
+        }
+    }
+}

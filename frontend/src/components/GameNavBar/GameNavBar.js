@@ -37,6 +37,15 @@ const GameNavBar = (props) => {
                     alt="adventure"
                 />
             </div>
+            <div
+                className="btn"
+                onClick={props.navClickHandler.bind(this, "player")}
+            >
+                <img
+                    src={require("../../assets/nav_player.png")}
+                    alt="player"
+                />
+            </div>
         </div>
     );
 };

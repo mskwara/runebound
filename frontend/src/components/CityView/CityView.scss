@@ -1,0 +1,81 @@
+@import "../../variables.scss";
+
+#CityView {
+    width: 760px;
+    height: 500px;
+    background-color: white;
+    border-radius: 3px;
+    position: absolute;
+    transform: translate(-50%, 0);
+    top: 100px;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    span {
+        margin-bottom: 10px;
+
+        .cityIcon {
+            width: 70px;
+            height: 70px;
+            margin-top: 10px;
+        }
+        .cityName {
+            color: black;
+            margin: 5px 0;
+        }
+    }
+    .storeWrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+
+        .switch-arrow {
+            width: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+        .arrow-left {
+            transform: rotate(180deg);
+            margin-right: 10px;
+            right: 0;
+        }
+        .arrow-left-hover {
+            &:hover {
+                right: 3px;
+            }
+        }
+        .arrow-right {
+            margin-left: 10px;
+            left: 0;
+        }
+        .arrow-right-hover {
+            &:hover {
+                left: 3px;
+            }
+        }
+        .store {
+            width: 680px;
+            height: 300px;
+            border: 1px solid rgb(146, 146, 146);
+            border-radius: 2px;
+            background-color: rgb(250, 250, 250);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    }
+    .finish {
+        background-color: $primary-blue;
+        color: white;
+        margin-top: 15px;
+
+        &:hover {
+            background-color: $primary-blue-hover;
+        }
+    }
+}

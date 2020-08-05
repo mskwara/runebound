@@ -59,23 +59,30 @@ const gameSchema = new mongoose.Schema({
             },
         },
     },
+    cities: [
+        {
+            cityId: Number,
+            items: [Number],
+        },
+    ],
+    availableItems: [Number],
     createdAt: {
         type: Date,
         default: Date.now(),
     },
 });
 
-gameSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "players.user",
-        select: "nick games",
-    });
-    // .populate({
-    //     path: "currentPlay.player",
-    //     select: "nick",
-    // });
-    next();
-});
+// gameSchema.pre(/^find/, function (next) {
+//     this.populate({
+//         path: "players.user",
+//         select: "nick",
+//     });
+//     // .populate({
+//     //     path: "currentPlay.player",
+//     //     select: "nick",
+//     // });
+//     next();
+// });
 
 const Game = mongoose.model("Game", gameSchema);
 

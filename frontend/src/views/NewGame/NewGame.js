@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import "./NewGame.scss";
 import PlayersSelect from "../../components/PlayersSelect/PlayersSelect";
 import cities from "../../data/cities";
+import items from "../../data/items";
 import axios from "axios";
 
 const NewGame = (props) => {
@@ -52,11 +53,16 @@ const NewGame = (props) => {
             };
             map.push(field);
         }
+        const citiesForDatabase = [];
         cities.forEach((city, cityId) => {
             // create cities
             const index = Math.floor(Math.random() * (rows * col - 0)) + 0;
             map[index].isCity = true;
             map[index].city = cityId;
+            citiesForDatabase.push({
+                cityId,
+                items: [], // TODO
+            });
         });
 
         for (let i = 0; i < 15; i++) {
@@ -124,11 +130,16 @@ const NewGame = (props) => {
             };
         }
 
-        return map;
+        return [map, citiesForDatabase];
     };
     const createGame = async () => {
-        const map = generateMap();
-        const data = { ...gameState };
+        const [map, citiesForDatabase] = generateMap();
+        const availableItems = [...items.keys()];
+        const data = {
+            ...gameState,
+            cities: citiesForDatabase,
+            availableItems,
+        };
         data.map = map;
         try {
             await axios.post("api/games", data);
